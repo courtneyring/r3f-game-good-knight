@@ -9,13 +9,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-const floor1Texture = new THREE.TextureLoader().load('./textures/grass.jpg');
-floor1Texture.wrapS = THREE.RepeatWrapping
-floor1Texture.wrapT = THREE.RepeatWrapping
-floor1Texture.repeat.set(5, 5)
-// const floor1Texture = useTexture('./textures/grass.jpg')
-const floor1Material = new THREE.MeshStandardMaterial({map: floor1Texture})
-const floor2Material = new THREE.MeshStandardMaterial({map: floor1Texture})
+const floorTexture = new THREE.TextureLoader().load('./textures/grass.jpg');
+floorTexture.wrapS = THREE.RepeatWrapping
+floorTexture.wrapT = THREE.RepeatWrapping
+floorTexture.repeat.set(5, 5)
+const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture })
 
 
 const loader = new GLTFLoader();
@@ -23,21 +21,12 @@ let brickMaterial;
 loader.load('./models/brick.glb', bricks => {
   bricks.scene.traverse((node) => {
     if (node instanceof THREE.Mesh && node.material.name == 'Mat.5') {
-      console.log(node)
-      const material = node.material
-      
-      
-      brickMaterial = material;
+      brickMaterial = node.material
     }
   })
-
 })
 
-
-
-function BlockStart({position=[0,0,0]}) {
-
-  
+function BlockStart({position=[0,0,0]}) {  
   return (
     <group position={position} >
       <Float floatIntensity={0.5} rotationIntensity={0.5}><Text 
@@ -53,10 +42,8 @@ function BlockStart({position=[0,0,0]}) {
           <meshBasicMaterial toneMapped={false}/>
         </Text></Float>
       
-      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor1Material} receiveShadow scale={[4, 0.2, 4]} />
-      
+      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floorMaterial} receiveShadow scale={[4, 0.2, 4]} />
     </group>
-    
   )
 }
 
@@ -67,7 +54,7 @@ function BlockEnd({position=[0,0,0]}) {
   })
   return (
     <group position={position} >
-      <mesh position={[0, 0, 0]} geometry={boxGeometry} material={floor1Material} receiveShadow scale={[4, 0.2, 4]} />
+      <mesh position={[0, 0, 0]} geometry={boxGeometry} material={floorMaterial} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='fixed' colliders='hull' position={[0, 0.25, 0]} restitution={0.2} friction={0} >
         <primitive object={castle.scene} scale={4} />
       </RigidBody>
@@ -100,7 +87,7 @@ function BlockSpinner({position=[0,0,0]}) {
 
   return (
     <group position={position} >
-      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
+      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floorMaterial} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle}>
         <mesh geometry={boxGeometry} material={material} receiveShadow castShadow scale={[3.5, 6, 0.3]} />
       </RigidBody>
@@ -124,7 +111,7 @@ function BlockGate({position=[0,0,0]}) {
 
   return (
     <group position={position} >
-      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
+      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floorMaterial} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle} >
         <Gltf src='./models/gate.glb' scale={0.15} castShadow/>
       </RigidBody>
@@ -157,7 +144,7 @@ function BlockDragon({position=[0,0,0]}) {
 
   return (
     <group position={position} >
-      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
+      <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floorMaterial} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle}>
         <Clone object={dragon.scene} scale={18} ref={dragonRef} castShadow/>
       </RigidBody>
@@ -169,12 +156,6 @@ function BlockDragon({position=[0,0,0]}) {
 
 function Bounds({length = 1}) {
 
-  // const bricks = useGLTF('./models/brick.glb')
-  // const material = bricks.materials['Mat.5']
-  // material.map.wrapS = THREE.RepeatWrapping;
-  // material.map.wrapT = THREE.RepeatWrapping;
-  // material.map.repeat.set(20, 2);
-  // brickMaterial = material;
   let material = brickMaterial?.clone()
   material.map.wrapS = THREE.RepeatWrapping;
   material.map.wrapT = THREE.RepeatWrapping;
@@ -182,7 +163,6 @@ function Bounds({length = 1}) {
 
   return <>
     <RigidBody type='fixed' restitution={0.2} friction={0}>
-
       <mesh position={[2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={material}  receiveShadow castShadow scale={[0.3, 3, length * 4]} />
       <mesh position={[-2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={material}  receiveShadow scale={[0.3, 3, length * 4]} />
       <mesh position={[0, 1.3, -(length * 4) + 2]} geometry={boxGeometry} material={material}  receiveShadow scale={[4, 3, 0.3]} />
