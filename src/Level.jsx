@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, Text, useGLTF, Sparkles, Gltf } from '@react-three/drei';
+import { Float, Text, useGLTF, useAnimations, Gltf, Clone } from '@react-three/drei';
 
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -88,7 +88,7 @@ function BlockSpinner({position=[0,0,0]}) {
     
   )
 }
-function BlockLimbo({position=[0,0,0]}) {
+function BlockGate({position=[0,0,0]}) {
   const gate = useGLTF('./models/gate.glb');
   const [timeOffset] = useState(() => Math.random() * Math.PI * 2)
   const obstacle = useRef()
@@ -105,7 +105,6 @@ function BlockLimbo({position=[0,0,0]}) {
     <group position={position} >
       <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle} >
-        {/* <mesh geometry={boxGeometry} material={obstacleMaterial} receiveShadow castShadow scale={[3.5, 0.3, 0.3]} /> */}
         <Gltf src='./models/gate.glb' scale={0.15} castShadow/>
       </RigidBody>
       
@@ -114,24 +113,33 @@ function BlockLimbo({position=[0,0,0]}) {
   )
 }
 
-function BlockAxe({position=[0,0,0]}) {
-
+function BlockDragon({position=[0,0,0]}) {
   const [timeOffset] = useState(() => Math.random() * Math.PI * 2)
   const obstacle = useRef()
+  const dragonRef = useRef()
+  const dragon = useGLTF('./models/dragon.glb')
+ 
+  // const animations = useAnimations(dragon.animations, dragon.scene)
+  // useEffect(() => {
+  //   animations.actions['Armature|hodit_tryaset_siskami'].play()
+  // }, [])
+  // animations.actions['Armature|hodit_tryaset_siskami'].play()
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    const x = Math.sin(time + timeOffset) * 1.25
-    obstacle.current.setNextKinematicTranslation({x: position[0] + x, y: position[1] + 0.75, z: position[2]})
+    const x = Math.sin(time + timeOffset) * 1.2
+    let currentTranslation = obstacle.current.translation().x
+    let rotationMult = x > currentTranslation ? 0.5 : 1.5;
+    dragonRef.current.rotation.set(0, Math.PI * rotationMult, 0)
+    obstacle.current.setNextKinematicTranslation({x: position[0] + x, y: position[1], z: position[2] })
   })
 
   return (
     <group position={position} >
       <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle}>
-        <mesh geometry={boxGeometry} material={obstacleMaterial} receiveShadow castShadow scale={[1.5, 1.5, 0.3]} />
+        <Clone object={dragon.scene} scale={18} ref={dragonRef} castShadow/>
       </RigidBody>
-      
     </group>
     
   )
@@ -157,7 +165,7 @@ function Bounds({length = 1}) {
   </>
 }
 
-export default function Level({count = 5, types=[BlockSpinner, BlockAxe, BlockLimbo], seed=0}) {
+export default function Level({count = 5, types=[BlockSpinner, BlockDragon, BlockGate], seed=0}) {
 
 
   const randomIntFromInterval = (min, max) => { // min and max included 
@@ -180,7 +188,6 @@ export default function Level({count = 5, types=[BlockSpinner, BlockAxe, BlockLi
     {blocks.map((Block, idx) => <Block key={idx} position={[0, 0, -(idx + 1) * 4]}/>)}
 
     <BlockEnd position={[0, 0, -(count + 1) * 4]} />
-
     <Bounds length={count + 2}/>
     
   </>
