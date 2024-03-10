@@ -16,15 +16,15 @@ floorTexture.repeat.set(5, 5)
 const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture })
 
 
-const loader = new GLTFLoader();
-let brickMaterial;
-loader.load('./models/brick.glb', bricks => {
-  bricks.scene.traverse((node) => {
-    if (node instanceof THREE.Mesh && node.material.name == 'Mat.5') {
-      brickMaterial = node.material
-    }
-  })
-})
+// const loader = new GLTFLoader();
+// let brickMaterial;
+// loader.load('./models/brick.glb', bricks => {
+//   bricks.scene.traverse((node) => {
+//     if (node instanceof THREE.Mesh && node.material.name == 'Mat.5') {
+//       brickMaterial = node.material
+//     }
+//   })
+// })
 
 function BlockStart({position=[0,0,0]}) {  
   return (
@@ -68,7 +68,8 @@ function BlockEnd({position=[0,0,0]}) {
 
 function BlockSpinner({position=[0,0,0]}) {
 
-  const material = brickMaterial.clone()
+  let bricks = useGLTF('./models/brick.glb')
+  let material = bricks.materials['Mat.5'];
   material.map.wrapS = THREE.ClampToEdgeWrapping;
   material.map.wrapT = THREE.ClampToEdgeWrapping;
   material.map.repeat.set(0.1, 0.1);
@@ -156,7 +157,8 @@ function BlockDragon({position=[0,0,0]}) {
 
 function Bounds({length = 1}) {
 
-  let material = brickMaterial?.clone()
+  let bricks = useGLTF('./models/brick.glb')
+  let material = bricks.materials['Mat.5'];
   material.map.wrapS = THREE.RepeatWrapping;
   material.map.wrapT = THREE.RepeatWrapping;
   material.map.repeat.set(20, 2);
