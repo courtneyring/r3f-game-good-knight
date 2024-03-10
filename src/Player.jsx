@@ -1,11 +1,8 @@
-import { useAnimations, useGLTF, useKeyboardControls, Gltf } from '@react-three/drei';
+import { useAnimations, useGLTF, useKeyboardControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef, useEffect, useState, useReducer } from 'react';
 import useGame from './stores/useGame';
-import Ecctrl, { EcctrlAnimation } from "ecctrl";
-import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
-
+import Ecctrl from "ecctrl";
 
 
 export default function Player() {
@@ -14,19 +11,12 @@ export default function Player() {
   const parent = useRef();
 
   const start = useGame((state) => state.start)
-  const restart = useGame((state) => state.restart)
   const end = useGame((state) => state.end)
   const blocksCount = useGame((state) => state.blocksCount)
 
   const knight = useGLTF('./models/knight.glb')
   const animations = useAnimations(knight.animations, knight.scene)
   const [animationName, setAnimation] = useState("Armature|idle1")
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
-
-
-  const reset = () => {
-
-  }
 
   useEffect(() => {
     const action = animations.actions[animationName]
@@ -66,7 +56,6 @@ export default function Player() {
     }
     else if (jump) {
       setAnimation("Armature|slash")
-      // parent.current.setTranslation({x: 0, y: 0, z:0})
     }
     else {
       setAnimation("Armature|idle")
