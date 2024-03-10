@@ -1,38 +1,26 @@
-import { Gltf, OrbitControls, useGLTF, Sky } from '@react-three/drei'
+import { OrbitControls, Sparkles, Sky } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber';
-import { Physics, RigidBody } from '@react-three/rapier'
+import { Physics } from '@react-three/rapier'
 import Lights from './Lights.jsx'
 import Level from './Level.jsx'
 import Player from './Player.jsx'
 import useGame from './stores/useGame.js'
-
-// import Controller from 'ecctrl'
-import { useControls } from 'leva'
-import { useRef } from 'react'
-
-
+import { useState } from 'react';
 
 export default function Experience() {
   const blocksCount = useGame((state) => state.blocksCount);
   const blocksSeed = useGame((state) => state.blocksSeed);
-  const phase = useGame((state) => state.phase)
-
-  useFrame((state) => {
-    if (phase == 'ended') {
-      state.camera.position.set(0, 2, 0)
-      state.camera.lookAt(0, 2, -4)
-    }
-  })
+  const showCharacter = useGame((state) => state.showCharacter)
 
 
   return <>
-    <OrbitControls makeDefault />
-    <Sky  inclination={0} azimuth={0.25} turbidity={0} rayleigh={2}  exposure={0.3}/>
+    <Sky inclination={0} azimuth={0.25} turbidity={0} rayleigh={2} exposure={0.3} />
+    <Sparkles count={5000} scale={100} size={6} speed={0.4} />
 
     <Physics >
       <Lights />
       <Level count={blocksCount} seed={blocksSeed} />
-      {phase != 'ended' &&<Player />}
+      {showCharacter && <Player/>}
     </Physics>
   </>
 }

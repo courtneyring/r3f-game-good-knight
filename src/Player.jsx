@@ -1,6 +1,6 @@
 import { useAnimations, useGLTF, useKeyboardControls } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import { useRef, useEffect, useState, useReducer } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useRef, useEffect, useState } from 'react';
 import useGame from './stores/useGame';
 import Ecctrl from "ecctrl";
 
@@ -9,6 +9,7 @@ export default function Player() {
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const body = useRef();
   const parent = useRef();
+  const {camera} = useThree();
 
   const start = useGame((state) => state.start)
   const end = useGame((state) => state.end)
@@ -17,6 +18,9 @@ export default function Player() {
   const knight = useGLTF('./models/knight.glb')
   const animations = useAnimations(knight.animations, knight.scene)
   const [animationName, setAnimation] = useState("Armature|idle1")
+
+
+
 
   useEffect(() => {
     const action = animations.actions[animationName]
@@ -68,22 +72,28 @@ export default function Player() {
 
     let outOfBounds = parentPosition.y < -4;
     let finished = parentPosition.z < -(blocksCount * 4 + 2)
-    if (outOfBounds || finished) end()
+
+    if (outOfBounds || finished) {
+      end()
+    }
       
   })
 
   return (
-    <Ecctrl
-      camInitDir={{ x: 0, y: Math.PI, z: 0 }}
-      characterInitDir={Math.PI}
-      floatHeight={0}
-      ref={parent}
-    >
-      {<primitive
-        ref={body}
-        object={knight.scene}
-        scale={1.5}
-        position={[0, -0.25, 0]} />}
-    </Ecctrl>
+    <>
+      <Ecctrl
+        camInitDir={{ x: 0, y: Math.PI, z: 0 }}
+        characterInitDir={Math.PI}
+        floatHeight={0}
+        ref={parent}
+      >
+        {<primitive
+          ref={body}
+          object={knight.scene}
+          scale={1.5}
+          position={[0, -0.25, 0]} />}
+      </Ecctrl>
+    </>
+   
   )
 }

@@ -173,9 +173,7 @@ export default function Level({count = 5, types=[BlockSpinner, BlockAxe, BlockLi
   return <>
 
     <BlockStart position={[0, 0, 0]}/>
-    <Sparkles count={5000} scale={100} size={6} speed={0.4} />
-
-
+    
     {blocks.map((Block, idx) => <Block key={idx} position={[0, 0, -(idx + 1) * 4]}/>)}
 
     <BlockEnd position={[0, 0, -(count + 1) * 4]} />
