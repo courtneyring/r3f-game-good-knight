@@ -141,13 +141,12 @@ function Bounds({length = 1}) {
   brickMaterial.map.wrapT = THREE.RepeatWrapping;
   brickMaterial.map.repeat.set(20, 2);
 
-  console.log(brickMaterial)
   return <>
     <RigidBody type='fixed' restitution={0.2} friction={0}>
 
-      <mesh position={[2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow castShadow scale={[0.3, 1.5, length * 4]} />
-      <mesh position={[-2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[0.3, 1.5, length * 4]} />
-      <mesh position={[0, 0.75, -(length * 4) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[4, 1.5, 0.3]} />
+      <mesh position={[2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow castShadow scale={[0.3, 3, length * 4]} />
+      <mesh position={[-2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[0.3, 3, length * 4]} />
+      <mesh position={[0, 1.3, -(length * 4) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[4, 3, 0.3]} />
       <CuboidCollider args={[2, 0.1, 2 * length]} position={[0, -0.1, -(length * 2) + 2]} restitution={0.2} friction={1}/>
     </RigidBody>
     

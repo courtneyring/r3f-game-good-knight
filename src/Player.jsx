@@ -1,52 +1,31 @@
-import { useAnimations, useGLTF, useKeyboardControls } from '@react-three/drei';
+import { useAnimations, useGLTF, useKeyboardControls, Gltf } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { RigidBody, CuboidCollider, useRapier } from '@react-three/rapier';
-import { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
+import { useRef, useEffect, useState, useReducer } from 'react';
 import useGame from './stores/useGame';
+import Ecctrl, { EcctrlAnimation } from "ecctrl";
+import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 
 
 
 export default function Player() {
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const body = useRef();
-  const {rapier, world} = useRapier();
-  const [smoothedCameraPosition] = useState(() => new THREE.Vector3(10, 10, 10))
-  const [smoothedCameraTarget] = useState(() => new THREE.Vector3())
+  const parent = useRef();
+
   const start = useGame((state) => state.start)
-  const end = useGame((state) => state.end)
   const restart = useGame((state) => state.restart)
-  const phase = useGame((state) => state.phase)
-  const blocksCount = useGame((state) =>  state.blocksCount)
-  const knight = useGLTF('./models/rogue_legacy_knight.glb')
+  const end = useGame((state) => state.end)
+  const blocksCount = useGame((state) => state.blocksCount)
+
+  const knight = useGLTF('./models/knight.glb')
   const animations = useAnimations(knight.animations, knight.scene)
   const [animationName, setAnimation] = useState("Armature|idle1")
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-  const SPEED = 2
-  const direction = new THREE.Vector3()
-  const frontVector = new THREE.Vector3()
-  const sideVector = new THREE.Vector3()
-  const rotation = new THREE.Vector3()
-
-  const jump = () => {
-    
-    const origin = body.current.translation();
-    origin.y -= 0.25;
-    const direction = { x: 0, y: -1, z: 0}
-    const ray = new rapier.Ray(origin, direction);
-    const hit = world.castRay(ray, 10, true)
-
-
-    if (hit.toi < 0.15) {
-      body.current.applyImpulse({ x: 0, y: 0.05, z: 0 })
-    }
-
-  }
 
   const reset = () => {
-    body.current.setTranslation({x:0, y:3, z:0})
-    body.current.setLinvel({x:0, y:0, z:0})
-    body.current.setAngvel({x:0, y:0, z:0})
+
   }
 
   useEffect(() => {
@@ -58,68 +37,25 @@ export default function Player() {
     }
   }, [animationName])
 
-  // useEffect(() => {
-  //   const unsubscribeReset = useGame.subscribe(
-  //     (state) => state.phase,
-  //     (value) => {if (value=='ready') reset()}
-  //   )
-    
-  //   const unsubscribeJump = subscribeKeys(
-  //     (state) => state.jump, 
-  //     (value) => {if (value) jump()}
-  //   )
-    
-  //   const unsubscribeAny = subscribeKeys(
-  //     () => start()
-  //   )
-      
-  //   return () => {
-  //     unsubscribeJump();
-  //     unsubscribeAny();
-  //     unsubscribeReset();
-  //   }
+  useEffect(() => {
+    const unsubscribeReset = useGame.subscribe(
+      (state) => state.phase,
+      (value) => { if (value == 'ready') reset() }
+    )
+    const unsubscribeAny = subscribeKeys(
+      () => start()
+    )
 
+    return () => {
+      unsubscribeAny();
+      unsubscribeReset();
+    }
+  }, [])
 
-  // }, [])
+  useFrame(() => {
 
-  useFrame((state, delta) => {
-
-    const {forward, backward, leftward, rightward, jump} = getKeys();
-    // const velocity = body.current.linvel();
-    // frontVector.set(0, 0, backward - forward)
-    // sideVector.set(leftward - rightward, 0, 0)
-    // direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(SPEED).applyEuler(state.camera.rotation)
-    // body.current.setLinvel({ x: direction.x, y: velocity.y, z: direction.z })
-   
-
-    // const impulse = { x: 0, y: 0, z: 0 }
-    // const torque = { x: 0, y: 0, z: 0 }
-
-    // const impulseStrength = 0.6 * delta
-    // const torqueStrength = 0.2 * delta
-
-
-    // if (forward) {
-    //   impulse.z -= impulseStrength
-    //   torque.x -= torqueStrength
-    // }
-
-    // if (rightward) {
-    //   impulse.x += impulseStrength
-    //   torque.z -= torqueStrength
-    // }
-
-    // if (backward) {
-    //   impulse.z += impulseStrength
-    //   torque.x += torqueStrength
-    // }
-
-    // if (leftward) {
-    //   impulse.x -= impulseStrength
-    //   torque.z += torqueStrength
-    // }
-    // body.current.applyImpulse(impulse)
-    // body.current.applyTorqueImpulse(torque)
+    const { forward, backward, leftward, rightward, jump } = getKeys();
+    let parentPosition = parent.current.translation()
 
     /**
      * Animations
@@ -130,6 +66,7 @@ export default function Player() {
     }
     else if (jump) {
       setAnimation("Armature|slash")
+      // parent.current.setTranslation({x: 0, y: 0, z:0})
     }
     else {
       setAnimation("Armature|idle")
@@ -137,46 +74,27 @@ export default function Player() {
 
 
     /**
-     * Camera
-     */
-    // const bodyPosition = body.current.translation();
-    // const cameraPosition = new THREE.Vector3()
-    // cameraPosition.copy(bodyPosition)
-    // cameraPosition.z += 2.25
-    // cameraPosition.y +=0.65
-    
-    // const cameraTarget = new THREE.Vector3()
-    // cameraTarget.copy(bodyPosition)
-    // cameraTarget.y += 0.25;
-
-    // smoothedCameraPosition.lerp(cameraPosition, 5 * delta)
-    // smoothedCameraTarget.lerp(cameraTarget, 5 * delta)
-
-    // state.camera.position.copy(smoothedCameraPosition)
-    // state.camera.lookAt(smoothedCameraTarget)
-
-
-    /**
      * Phases
      */
-    // if (bodyPosition.z < -(blocksCount * 4 +2))
-    //   end()
 
-    // if(bodyPosition.y < -4)
-    //   restart()
-
-
-
+    let outOfBounds = parentPosition.y < -4;
+    let finished = parentPosition.z < -(blocksCount * 4 + 2)
+    if (outOfBounds || finished) end()
+      
   })
 
-  return <>
-    {/* <RigidBody position={[0, 0.6, 0]} colliders={false} restitution={0.2} friction={1} canSleep={false} ref={body} linearDamping={0.5} angularDamping={0.5} type='dynamic' enabledRotations={[false, false, false]}> */}
-
-      {/* <CuboidCollider args={[0.08, 0.2, 0.08]} position={[0, 0.1, 0]} /> */}
-      <primitive object={knight.scene} scale={0.5} rotation={[0, Math.PI, 0]} />
-
-      
-    {/* </RigidBody> */}
-    
-  </>
+  return (
+    <Ecctrl
+      camInitDir={{ x: 0, y: Math.PI, z: 0 }}
+      characterInitDir={Math.PI}
+      floatHeight={0}
+      ref={parent}
+    >
+      {<primitive
+        ref={body}
+        object={knight.scene}
+        scale={1.5}
+        position={[0, -0.25, 0]} />}
+    </Ecctrl>
+  )
 }
