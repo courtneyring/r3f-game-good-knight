@@ -140,7 +140,7 @@ export default function Player() {
   })
 
   return <>
-    <RigidBody position={[0, 0.5, 0]} colliders={false} restitution={0.2} friction={1} canSleep={false} ref={body} linearDamping={0.5} angularDamping={0.5} type='dynamic' enabledRotations={[false, false, false]}>
+    <RigidBody position={[0, 0.6, 0]} colliders={false} restitution={0.2} friction={1} canSleep={false} ref={body} linearDamping={0.5} angularDamping={0.5} type='dynamic' enabledRotations={[false, false, false]}>
       <CuboidCollider args={[0.08, 0.2, 0.08]} position={ [ 0, 0.1, 0 ] }/>
       <primitive object={knight.scene} scale={0.5} rotation={[0, Math.PI, 0]}/>
     </RigidBody>

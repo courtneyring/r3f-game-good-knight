@@ -2,14 +2,21 @@ import * as THREE from 'three';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, Text, useGLTF } from '@react-three/drei';
+import { Float, Text, useGLTF, useTexture } from '@react-three/drei';
+
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-const floor1Material = new THREE.MeshStandardMaterial({color: 'limegreen'})
-const floor2Material = new THREE.MeshStandardMaterial({color: 'greenyellow'})
+const floor1Texture = new THREE.TextureLoader().load('./textures/grass.jpg');
+floor1Texture.wrapS = THREE.RepeatWrapping
+floor1Texture.wrapT = THREE.RepeatWrapping
+floor1Texture.repeat.set(3, 3)
+// const floor1Texture = useTexture('./textures/grass.jpg')
+const floor1Material = new THREE.MeshStandardMaterial({map: floor1Texture})
+const floor2Material = new THREE.MeshStandardMaterial({map: floor1Texture})
 const obstacleMaterial = new THREE.MeshStandardMaterial({color: 'orangered'})
 const wallMaterial = new THREE.MeshStandardMaterial({color: 'slategrey'})
+
 
 
 
@@ -38,15 +45,15 @@ function BlockStart({position=[0,0,0]}) {
 }
 
 function BlockEnd({position=[0,0,0]}) {
-  const hamburger = useGLTF('./hamburger.glb')
-  hamburger.scene.children.forEach((child) => {
+  const castle = useGLTF('./models/castle.glb')
+  castle.scene.children.forEach((child) => {
     child.castShadow = true;
   })
   return (
     <group position={position} >
       <mesh position={[0, 0, 0]} geometry={boxGeometry} material={floor1Material} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='fixed' colliders='hull' position={[0, 0.25, 0]} restitution={0.2} friction={0} >
-        <primitive object={hamburger.scene} scale={0.2} />
+        <primitive object={castle.scene} scale={4} />
       </RigidBody>
       <Text font='./bebas-neue-v9-latin-regular.woff' scale={1} position={[0, 2.25, 2]}>FINISH
         <meshBasicMaterial toneMapped={false} />
@@ -128,12 +135,19 @@ function BlockAxe({position=[0,0,0]}) {
 
 
 function Bounds({length = 1}) {
+  const bricks = useGLTF('./models/brick.glb')
+  const brickMaterial = bricks.materials['Mat.5']
+  brickMaterial.map.wrapS = THREE.RepeatWrapping;
+  brickMaterial.map.wrapT = THREE.RepeatWrapping;
+  brickMaterial.map.repeat.set(20, 2);
+
+  console.log(brickMaterial)
   return <>
     <RigidBody type='fixed' restitution={0.2} friction={0}>
 
-      <mesh position={[2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={wallMaterial} receiveShadow castShadow scale={[0.3, 1.5, length * 4]} />
-      <mesh position={[-2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={wallMaterial} receiveShadow scale={[0.3, 1.5, length * 4]} />
-      <mesh position={[0, 0.75, -(length * 4) + 2]} geometry={boxGeometry} material={wallMaterial} receiveShadow scale={[4, 1.5, 0.3]} />
+      <mesh position={[2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow castShadow scale={[0.3, 1.5, length * 4]} />
+      <mesh position={[-2.15, 0.75, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[0.3, 1.5, length * 4]} />
+      <mesh position={[0, 0.75, -(length * 4) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[4, 1.5, 0.3]} />
       <CuboidCollider args={[2, 0.1, 2 * length]} position={[0, -0.1, -(length * 2) + 2]} restitution={0.2} friction={1}/>
     </RigidBody>
     

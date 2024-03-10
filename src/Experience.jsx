@@ -12,7 +12,7 @@ export default function Experience() {
 
   return <>
 
-    {/* <OrbitControls makeDefault /> */}
+    <OrbitControls makeDefault />
     
     <color args={['#bdedfc']} attach='background' />
     <Physics debug>
