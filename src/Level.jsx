@@ -10,7 +10,7 @@ const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 const floor1Texture = new THREE.TextureLoader().load('./textures/grass.jpg');
 floor1Texture.wrapS = THREE.RepeatWrapping
 floor1Texture.wrapT = THREE.RepeatWrapping
-floor1Texture.repeat.set(3, 3)
+floor1Texture.repeat.set(5, 5)
 // const floor1Texture = useTexture('./textures/grass.jpg')
 const floor1Material = new THREE.MeshStandardMaterial({map: floor1Texture})
 const floor2Material = new THREE.MeshStandardMaterial({map: floor1Texture})

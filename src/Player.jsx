@@ -5,6 +5,8 @@ import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import useGame from './stores/useGame';
 
+
+
 export default function Player() {
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const body = useRef();
@@ -27,16 +29,18 @@ export default function Player() {
   const rotation = new THREE.Vector3()
 
   const jump = () => {
-    // const origin = body.current.translation();
-    // origin.y -= 0.31;
-    // const direction = { x: 0, y: -1, z: 0}
-    // const ray = new rapier.Ray(origin, direction);
-    // const hit = world.castRay(ray, 10, true)
-    // console.log(hit)
+    
+    const origin = body.current.translation();
+    origin.y -= 0.25;
+    const direction = { x: 0, y: -1, z: 0}
+    const ray = new rapier.Ray(origin, direction);
+    const hit = world.castRay(ray, 10, true)
 
-    // if (hit.toi < 0.15) {
-    //   body.current.applyImpulse({ x: 0, y: 0.5, z: 0 })
-    // }
+
+    if (hit.toi < 0.15) {
+      body.current.applyImpulse({ x: 0, y: 0.05, z: 0 })
+    }
+
   }
 
   const reset = () => {
@@ -54,42 +58,68 @@ export default function Player() {
     }
   }, [animationName])
 
-  useEffect(() => {
-    const unsubscribeReset = useGame.subscribe(
-      (state) => state.phase,
-      (value) => {if (value=='ready') reset()}
-    )
+  // useEffect(() => {
+  //   const unsubscribeReset = useGame.subscribe(
+  //     (state) => state.phase,
+  //     (value) => {if (value=='ready') reset()}
+  //   )
     
-    const unsubscribeJump = subscribeKeys(
-      (state) => state.jump, 
-      (value) => {if (value) jump()}
-    )
+  //   const unsubscribeJump = subscribeKeys(
+  //     (state) => state.jump, 
+  //     (value) => {if (value) jump()}
+  //   )
     
-    const unsubscribeAny = subscribeKeys(
-      () => start()
-    )
+  //   const unsubscribeAny = subscribeKeys(
+  //     () => start()
+  //   )
       
-    return () => {
-      // unsubscribeJump();
-      unsubscribeAny();
-      unsubscribeReset();
-    }
+  //   return () => {
+  //     unsubscribeJump();
+  //     unsubscribeAny();
+  //     unsubscribeReset();
+  //   }
 
 
-  }, [])
+  // }, [])
 
   useFrame((state, delta) => {
 
     const {forward, backward, leftward, rightward, jump} = getKeys();
-    const velocity = body.current.linvel();
-    frontVector.set(0, 0, backward - forward)
-    sideVector.set(leftward - rightward, 0, 0)
-    direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(SPEED).applyEuler(state.camera.rotation)
-    body.current.setLinvel({ x: direction.x, y: velocity.y, z: direction.z })
-    const ray = world.castRay(new rapier.Ray(body.current.translation(), { x: 0, y: -1, z: 0 }))
-    const grounded = ray && ray.collider && Math.abs(ray.toi) <= 1.75
-    if (jump && grounded) body.current.setLinvel({ x: 0, y: 7.5, z: 0 })
+    // const velocity = body.current.linvel();
+    // frontVector.set(0, 0, backward - forward)
+    // sideVector.set(leftward - rightward, 0, 0)
+    // direction.subVectors(frontVector, sideVector).normalize().multiplyScalar(SPEED).applyEuler(state.camera.rotation)
+    // body.current.setLinvel({ x: direction.x, y: velocity.y, z: direction.z })
+   
 
+    // const impulse = { x: 0, y: 0, z: 0 }
+    // const torque = { x: 0, y: 0, z: 0 }
+
+    // const impulseStrength = 0.6 * delta
+    // const torqueStrength = 0.2 * delta
+
+
+    // if (forward) {
+    //   impulse.z -= impulseStrength
+    //   torque.x -= torqueStrength
+    // }
+
+    // if (rightward) {
+    //   impulse.x += impulseStrength
+    //   torque.z -= torqueStrength
+    // }
+
+    // if (backward) {
+    //   impulse.z += impulseStrength
+    //   torque.x += torqueStrength
+    // }
+
+    // if (leftward) {
+    //   impulse.x -= impulseStrength
+    //   torque.z += torqueStrength
+    // }
+    // body.current.applyImpulse(impulse)
+    // body.current.applyTorqueImpulse(torque)
 
     /**
      * Animations
@@ -109,41 +139,44 @@ export default function Player() {
     /**
      * Camera
      */
-    const bodyPosition = body.current.translation();
-    const cameraPosition = new THREE.Vector3()
-    cameraPosition.copy(bodyPosition)
-    cameraPosition.z += 2.25
-    cameraPosition.y +=0.65
+    // const bodyPosition = body.current.translation();
+    // const cameraPosition = new THREE.Vector3()
+    // cameraPosition.copy(bodyPosition)
+    // cameraPosition.z += 2.25
+    // cameraPosition.y +=0.65
     
-    const cameraTarget = new THREE.Vector3()
-    cameraTarget.copy(bodyPosition)
-    cameraTarget.y += 0.25;
+    // const cameraTarget = new THREE.Vector3()
+    // cameraTarget.copy(bodyPosition)
+    // cameraTarget.y += 0.25;
 
-    smoothedCameraPosition.lerp(cameraPosition, 5 * delta)
-    smoothedCameraTarget.lerp(cameraTarget, 5 * delta)
+    // smoothedCameraPosition.lerp(cameraPosition, 5 * delta)
+    // smoothedCameraTarget.lerp(cameraTarget, 5 * delta)
 
-    state.camera.position.copy(smoothedCameraPosition)
-    state.camera.lookAt(smoothedCameraTarget)
+    // state.camera.position.copy(smoothedCameraPosition)
+    // state.camera.lookAt(smoothedCameraTarget)
 
 
     /**
      * Phases
      */
-    if (bodyPosition.z < -(blocksCount * 4 +2))
-      end()
+    // if (bodyPosition.z < -(blocksCount * 4 +2))
+    //   end()
 
-    if(bodyPosition.y < -4)
-      restart()
+    // if(bodyPosition.y < -4)
+    //   restart()
 
 
 
   })
 
   return <>
-    <RigidBody position={[0, 0.6, 0]} colliders={false} restitution={0.2} friction={1} canSleep={false} ref={body} linearDamping={0.5} angularDamping={0.5} type='dynamic' enabledRotations={[false, false, false]}>
-      <CuboidCollider args={[0.08, 0.2, 0.08]} position={ [ 0, 0.1, 0 ] }/>
-      <primitive object={knight.scene} scale={0.5} rotation={[0, Math.PI, 0]}/>
-    </RigidBody>
+    {/* <RigidBody position={[0, 0.6, 0]} colliders={false} restitution={0.2} friction={1} canSleep={false} ref={body} linearDamping={0.5} angularDamping={0.5} type='dynamic' enabledRotations={[false, false, false]}> */}
+
+      {/* <CuboidCollider args={[0.08, 0.2, 0.08]} position={[0, 0.1, 0]} /> */}
+      <primitive object={knight.scene} scale={0.5} rotation={[0, Math.PI, 0]} />
+
+      
+    {/* </RigidBody> */}
     
   </>
 }

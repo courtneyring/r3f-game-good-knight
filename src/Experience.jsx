@@ -4,6 +4,7 @@ import Lights from './Lights.jsx'
 import Level from './Level.jsx'
 import Player from './Player.jsx'
 import useGame from './stores/useGame.js'
+import Ecctrl, { EcctrlAnimation } from "ecctrl";
 
 
 export default function Experience() {
@@ -18,7 +19,10 @@ export default function Experience() {
     <Physics debug>
       <Lights />
       <Level count={blocksCount} seed={blocksSeed}/>
-      <Player />
+      <Ecctrl>
+        <Player />
+      </Ecctrl>
+      
     </Physics>
 
 
