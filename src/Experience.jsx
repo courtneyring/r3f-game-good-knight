@@ -10,7 +10,7 @@ import { useState } from 'react';
 export default function Experience() {
   const blocksCount = useGame((state) => state.blocksCount);
   const blocksSeed = useGame((state) => state.blocksSeed);
-  const showCharacter = useGame((state) => state.showCharacter)
+  const showLevel = useGame((state) => state.showLevel)
 
 
   return <>
@@ -19,8 +19,10 @@ export default function Experience() {
 
     <Physics >
       <Lights />
-      <Level count={blocksCount} seed={blocksSeed} />
-      {showCharacter && <Player/>}
+      {showLevel && <>
+        <Level count={blocksCount} seed={blocksSeed} />
+        <Player />
+      </>}
     </Physics>
   </>
 }

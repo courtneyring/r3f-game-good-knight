@@ -3,6 +3,8 @@ import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Float, Text, useGLTF, useAnimations, Gltf, Clone } from '@react-three/drei';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -14,9 +16,22 @@ floor1Texture.repeat.set(5, 5)
 // const floor1Texture = useTexture('./textures/grass.jpg')
 const floor1Material = new THREE.MeshStandardMaterial({map: floor1Texture})
 const floor2Material = new THREE.MeshStandardMaterial({map: floor1Texture})
-const obstacleMaterial = new THREE.MeshStandardMaterial({color: 'orangered'})
-const wallMaterial = new THREE.MeshStandardMaterial({color: 'slategrey'})
 
+
+const loader = new GLTFLoader();
+let brickMaterial;
+loader.load('./models/brick.glb', bricks => {
+  bricks.scene.traverse((node) => {
+    if (node instanceof THREE.Mesh && node.material.name == 'Mat.5') {
+      console.log(node)
+      const material = node.material
+      
+      
+      brickMaterial = material;
+    }
+  })
+
+})
 
 
 
@@ -66,6 +81,12 @@ function BlockEnd({position=[0,0,0]}) {
 
 function BlockSpinner({position=[0,0,0]}) {
 
+  const material = brickMaterial.clone()
+  material.map.wrapS = THREE.ClampToEdgeWrapping;
+  material.map.wrapT = THREE.ClampToEdgeWrapping;
+  material.map.repeat.set(0.1, 0.1);
+  material.flipY= false;
+
   const [speed] = useState(Math.random() + 0.2 * (Math.random() - 0.5 ? -1 : 1))
   const obstacle = useRef()
 
@@ -81,7 +102,7 @@ function BlockSpinner({position=[0,0,0]}) {
     <group position={position} >
       <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor2Material} receiveShadow scale={[4, 0.2, 4]} />
       <RigidBody type='kinematicPosition' restitution={0.2} friction={0} ref={obstacle}>
-        <mesh geometry={boxGeometry} material={obstacleMaterial} receiveShadow castShadow scale={[3.5, 0.3, 0.3]} />
+        <mesh geometry={boxGeometry} material={material} receiveShadow castShadow scale={[3.5, 6, 0.3]} />
       </RigidBody>
       
     </group>
@@ -119,19 +140,19 @@ function BlockDragon({position=[0,0,0]}) {
   const dragonRef = useRef()
   const dragon = useGLTF('./models/dragon.glb')
  
-  // const animations = useAnimations(dragon.animations, dragon.scene)
-  // useEffect(() => {
-  //   animations.actions['Armature|hodit_tryaset_siskami'].play()
-  // }, [])
-  // animations.actions['Armature|hodit_tryaset_siskami'].play()
+  const {actions} = useAnimations(dragon.animations, dragonRef)
+  useEffect(() => {
+    actions['Armature|hodit_tryaset_siskami'].play()
+    return () => actions['Armature|hodit_tryaset_siskami']?.reset()
+  }, [])
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     const x = Math.sin(time + timeOffset) * 1.2
-    let currentTranslation = obstacle.current.translation().x
+    let currentTranslation = obstacle.current?.translation().x
     let rotationMult = x > currentTranslation ? 0.5 : 1.5;
     dragonRef.current.rotation.set(0, Math.PI * rotationMult, 0)
-    obstacle.current.setNextKinematicTranslation({x: position[0] + x, y: position[1], z: position[2] })
+    obstacle.current?.setNextKinematicTranslation({x: position[0] + x, y: position[1], z: position[2] })
   })
 
   return (
@@ -147,18 +168,24 @@ function BlockDragon({position=[0,0,0]}) {
 
 
 function Bounds({length = 1}) {
-  const bricks = useGLTF('./models/brick.glb')
-  const brickMaterial = bricks.materials['Mat.5']
-  brickMaterial.map.wrapS = THREE.RepeatWrapping;
-  brickMaterial.map.wrapT = THREE.RepeatWrapping;
-  brickMaterial.map.repeat.set(20, 2);
+
+  // const bricks = useGLTF('./models/brick.glb')
+  // const material = bricks.materials['Mat.5']
+  // material.map.wrapS = THREE.RepeatWrapping;
+  // material.map.wrapT = THREE.RepeatWrapping;
+  // material.map.repeat.set(20, 2);
+  // brickMaterial = material;
+  let material = brickMaterial?.clone()
+  material.map.wrapS = THREE.RepeatWrapping;
+  material.map.wrapT = THREE.RepeatWrapping;
+  material.map.repeat.set(20, 2);
 
   return <>
     <RigidBody type='fixed' restitution={0.2} friction={0}>
 
-      <mesh position={[2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow castShadow scale={[0.3, 3, length * 4]} />
-      <mesh position={[-2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[0.3, 3, length * 4]} />
-      <mesh position={[0, 1.3, -(length * 4) + 2]} geometry={boxGeometry} material={brickMaterial}  receiveShadow scale={[4, 3, 0.3]} />
+      <mesh position={[2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={material}  receiveShadow castShadow scale={[0.3, 3, length * 4]} />
+      <mesh position={[-2.15, 1.3, -(length * 2) + 2]} geometry={boxGeometry} material={material}  receiveShadow scale={[0.3, 3, length * 4]} />
+      <mesh position={[0, 1.3, -(length * 4) + 2]} geometry={boxGeometry} material={material}  receiveShadow scale={[4, 3, 0.3]} />
       <CuboidCollider args={[2, 0.1, 2 * length]} position={[0, -0.1, -(length * 2) + 2]} restitution={0.2} friction={1}/>
     </RigidBody>
     

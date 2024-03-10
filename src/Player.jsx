@@ -86,7 +86,7 @@ export default function Player() {
         characterInitDir={Math.PI}
         floatHeight={0}
         ref={parent}
-        maxVelLimit={5}
+        maxVelLimit={7}
       >
         {<primitive
           ref={body}
