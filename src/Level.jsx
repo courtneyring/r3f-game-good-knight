@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RigidBody, CuboidCollider } from '@react-three/rapier';
 import { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, Text, useGLTF, useTexture } from '@react-three/drei';
+import { Float, Text, useGLTF, Sparkles } from '@react-three/drei';
 
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -34,9 +34,10 @@ function BlockStart({position=[0,0,0]}) {
         rotation-y={-0.25}
         position={[0.75, 0.65, 0]}
         >
-          Marble Race
+          Good Knight Rescue
           <meshBasicMaterial toneMapped={false}/>
         </Text></Float>
+      
       <mesh position={[0, -0.1, 0]} geometry={boxGeometry} material={floor1Material} receiveShadow scale={[4, 0.2, 4]} />
       
     </group>
@@ -172,6 +173,7 @@ export default function Level({count = 5, types=[BlockSpinner, BlockAxe, BlockLi
   return <>
 
     <BlockStart position={[0, 0, 0]}/>
+    <Sparkles count={5000} scale={100} size={6} speed={0.4} />
 
 
     {blocks.map((Block, idx) => <Block key={idx} position={[0, 0, -(idx + 1) * 4]}/>)}

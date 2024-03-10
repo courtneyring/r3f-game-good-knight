@@ -1,4 +1,4 @@
-import { Gltf, OrbitControls, useGLTF } from '@react-three/drei'
+import { Gltf, OrbitControls, useGLTF, Sky } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber';
 import { Physics, RigidBody } from '@react-three/rapier'
 import Lights from './Lights.jsx'
@@ -27,8 +27,9 @@ export default function Experience() {
 
   return <>
     <OrbitControls makeDefault />
-    <color args={['#bdedfc']} attach='background' />
-    <Physics debug>
+    <Sky  inclination={0} azimuth={0.25} turbidity={0} rayleigh={2}  exposure={0.3}/>
+
+    <Physics >
       <Lights />
       <Level count={blocksCount} seed={blocksSeed} />
       {phase != 'ended' &&<Player />}
