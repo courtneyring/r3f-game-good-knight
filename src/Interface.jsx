@@ -2,6 +2,9 @@ import { useKeyboardControls } from '@react-three/drei';
 import useGame from './stores/useGame';
 import { useEffect, useState, useRef } from 'react';
 import { addEffect } from '@react-three/fiber';
+import Modal from './components/Modal';
+import Button from './components/Button';
+import Credits from './modals/Credits';
 
 export default function Interface() {
 
@@ -15,10 +18,13 @@ export default function Interface() {
   // const startTime = useGame((state) => state.startTime)
   // const endTime = useGame((state) => state.endTime)
   const time = useRef();
+  const [showCredits, setShowCredits] = useState(false)
 
   const restartGame = () => {
     restart();
   }
+
+
 
   useEffect(() => {
     const unsubscribeEffect = addEffect(() => {
@@ -58,6 +64,12 @@ export default function Interface() {
           <div className={`key large ${jump && 'active'}`}></div>
         </div>
       </div>
+      <div className='credits'>
+        <Button clickFn={() => {console.log('here'); setShowCredits(true)}}>Credits</Button>
+      </div>
+      {showCredits &&<Modal closeFn={() => setShowCredits(false)}>
+        <Credits />
+      </Modal>}
     </div>
   )
 }

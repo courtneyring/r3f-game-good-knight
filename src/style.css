@@ -18,7 +18,7 @@ body,
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
+  /* pointer-events: none; */
   font-family: 'Bebas Neue', cursive, sans-serif;
 }
 
@@ -83,4 +83,12 @@ body,
 .controls .key.active
 {
     background: #ffffff99;
+}
+
+
+/* Credits */
+.credits {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
 }
