@@ -1,24 +1,33 @@
+
 # Good Knight Rescue
 
-This is a react-three-fiber experiment adapted from Bruno Simon's tutorial. The player control is implemented with Ecctrl, a drei pacakge.
+This is a react-three-fiber experiment adapted from Bruno Simon's Three.js course. The player control is implemented with Ecctrl.
 
 
-## Developing
+## Demo
 
-Install dependencies with `npm install`, then start a development server:
+https://courtneyring.github.io/r3f-game-good-knight/
+
+## Run Locally
+
+Install dependencies
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+  npm install
 ```
 
-## Building
-
-To create a production version of your app:
+Start the server
 
 ```bash
-npm run build
+  npm run dev
+```
+
+
+## Production Build
+
+To create a production build, run
+
+```bash
+  npm run build
 ```
 
